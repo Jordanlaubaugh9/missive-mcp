@@ -905,6 +905,97 @@ async def create_custom_message(
         except Exception as e:
             return f"Error creating message: {str(e)}"
 
+# ============================================================================
+# USER ENDPOINTS
+# ============================================================================
+
+@mcp.tool
+async def get_users(
+    organization_id: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0
+) -> str:
+    """List users in organizations the authenticated user is part of.
+    
+    Args:
+        organization_id: Optional organization ID to filter users
+        limit: Number of users to return (max 200, default 50)
+        offset: Offset for pagination (default 0)
+    """
+    
+    try:
+        api_token = get_api_token()
+    except ValueError as e:
+        return f"Error: {str(e)}"
+    
+    # Build parameters
+    params = {
+        "limit": min(limit, 200),
+        "offset": max(offset, 0)
+    }
+    
+    if organization_id:
+        params["organization"] = organization_id
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                "https://public.missiveapp.com/v1/users",
+                headers={"Authorization": f"Bearer {api_token}"},
+                params=params
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            users = data.get("users", [])
+            if not users:
+                org_filter = f" in organization {organization_id}" if organization_id else ""
+                return f"No users found{org_filter}"
+            
+            # Find the authenticated user
+            current_user = next((u for u in users if u.get("me")), None)
+            
+            result = f"👥 Users ({len(users)} found"
+            if organization_id:
+                result += f" in organization {organization_id}"
+            result += "):\n\n"
+            
+            # Show current user first if found
+            if current_user:
+                result += f"🔹 {current_user.get('name', 'Unknown')} (You)\n"
+                result += f"   Email: {current_user.get('email', 'No email')}\n"
+                result += f"   ID: {current_user.get('id')}\n"
+                if current_user.get('avatar_url'):
+                    result += f"   Avatar: {current_user.get('avatar_url')}\n"
+                result += "\n"
+            
+            # Show other users
+            other_users = [u for u in users if not u.get("me")]
+            for i, user in enumerate(other_users, 1):
+                result += f"{i}. {user.get('name', 'Unknown')}\n"
+                result += f"   Email: {user.get('email', 'No email')}\n"
+                result += f"   ID: {user.get('id')}\n"
+                if user.get('avatar_url'):
+                    result += f"   Avatar: {user.get('avatar_url')}\n"
+                result += "\n"
+            
+            # Add pagination info if applicable
+            if len(users) == limit:
+                result += f"📄 Showing {len(users)} users (offset: {offset})\n"
+                result += f"Use offset={offset + limit} to see more users.\n"
+            
+            return result
+            
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 401:
+                return "Error: Invalid Missive API token. Please check your token in Claude Desktop config."
+            elif e.response.status_code == 404:
+                return f"Error: Organization {organization_id} not found" if organization_id else "Error: Users endpoint not found"
+            else:
+                return f"Error fetching users: HTTP {e.response.status_code}"
+        except Exception as e:
+            return f"Error fetching users: {str(e)}"
+
 # Run the server in stdio mode only (for Claude Desktop)
 if __name__ == "__main__":
     mcp.run()

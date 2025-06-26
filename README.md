@@ -176,6 +176,9 @@ This server implements the following MCP tools:
 - **`search_messages_by_email_id`**: Find messages by email Message-ID header
 - **`create_custom_message`**: Create a message in a custom channel
 
+### **User Management Tools**
+- **`get_users`**: List users in organizations with optional filtering and pagination
+
 ### **Example Usage with Claude**
 Ask Claude things like:
 - "Show me my flagged conversations"
@@ -184,6 +187,8 @@ Ask Claude things like:
 - "Update task abc123 to mark it as completed"
 - "Get the full content of message def456"
 - "Search for messages with Message-ID <example@domain.com>"
+- "Show me all users in my organization"
+- "List users for organization abc123"
 
 ## 🤝 Contributing
 
