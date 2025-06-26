@@ -4,7 +4,23 @@ Model Context Protocol (MCP) server for accessing Missive conversations in Claud
 
 ## 🎯 What This Provides
 
+### **Conversation Management**
 - **Get Conversations**: Retrieve recent conversations from your Missive inbox
+- **Filtered Conversations**: Get conversations by mailbox (inbox, assigned, closed, flagged, etc.)
+- **Conversation Details**: Get detailed information about specific conversations
+- **Conversation Messages**: Retrieve messages from any conversation
+- **Conversation Comments**: Get comments and tasks from conversations
+
+### **Task Management**
+- **Create Tasks**: Create standalone tasks or conversation subtasks
+- **Update Tasks**: Modify task details, state, assignees, and due dates
+
+### **Message Operations**
+- **Message Details**: Get full message content including attachments
+- **Search Messages**: Find messages by email Message-ID
+- **Create Messages**: Send messages through custom channels
+
+### **Security & Integration**
 - **Secure Authentication**: Uses your personal Missive API token
 - **Claude Integration**: Works seamlessly with Claude Desktop
 - **Local Execution**: Runs entirely on your machine for privacy and security
@@ -142,15 +158,32 @@ The server uses the [FastMCP](https://github.com/jlowin/fastmcp) framework. To a
 
 ## 📚 API Reference
 
-This server currently implements:
+This server implements the following MCP tools:
 
-- **`get_conversations`**: Retrieves recent conversations from your Missive inbox
+### **Conversation Tools**
+- **`get_conversations`**: Get recent conversations from your Missive inbox
+- **`get_conversations_filtered`**: Get conversations with filtering (inbox, assigned, closed, flagged, etc.)
+- **`get_conversation_details`**: Get detailed information about a specific conversation
+- **`get_conversation_messages`**: Get messages from a specific conversation
+- **`get_conversation_comments`**: Get comments from a specific conversation
 
-Future tools could include:
-- Send messages
-- Create tasks
-- Search conversations
-- Manage labels
+### **Task Management Tools**
+- **`create_task`**: Create a new task (standalone or conversation subtask)
+- **`update_task`**: Update an existing task (title, description, state, assignees, due date)
+
+### **Message Tools**
+- **`get_message_details`**: Get full details of a specific message including body and attachments
+- **`search_messages_by_email_id`**: Find messages by email Message-ID header
+- **`create_custom_message`**: Create a message in a custom channel
+
+### **Example Usage with Claude**
+Ask Claude things like:
+- "Show me my flagged conversations"
+- "Get details for conversation ID abc123"
+- "Create a task titled 'Follow up with client' assigned to team xyz"
+- "Update task abc123 to mark it as completed"
+- "Get the full content of message def456"
+- "Search for messages with Message-ID <example@domain.com>"
 
 ## 🤝 Contributing
 
